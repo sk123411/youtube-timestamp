@@ -8,6 +8,8 @@ function App() {
   const [language, setLanguage] = useState('en');
   const [results, setResults] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
 
   // Check if the chrome object is available
   const isChromeExtension = typeof chrome !== 'undefined' && chrome.storage;
@@ -37,6 +39,9 @@ function App() {
       return;
     }
 
+    setLoading(true); // Start loading
+    setError(""); // Clear previous errors
+
     try {
       const response = await axios.post('http://127.0.0.1:5000/analyze', {
         video_url: videoUrl,
@@ -46,8 +51,27 @@ function App() {
       setResults(response.data);
       setError('');
     } catch (err) {
-      setError('Error analyzing the video. Please check the URL and try again.');
+      if (err.response) {
+        // Server responded with a status code outside the 2xx range
+        if (err.response.status === 400) {
+          setError('Invalid request. Please check your input and try again.');
+        } else if (err.response.status === 404) {
+          setError('No matches found for the given query.');
+        } else if (err.response.status === 500) {
+          setError('Server error. Please try again later.');
+        } else {
+          setError(`Unexpected error: ${err.response.status}`);
+        }
+      } else if (err.request) {
+        // Request was made but no response received
+        setError('No response from server. Please check your internet connection.');
+      } else {
+        // Other errors
+        setError('Something went wrong. Please try again.');
+      }
       setResults([]);
+    }finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -61,7 +85,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>YouTube Video Analyzer</h1>
+      <h1>YouTube Timestamp</h1>
       <div className="input-group">
         <input
           type="text"
@@ -93,13 +117,18 @@ function App() {
         <button onClick={handleAnalyze}>Analyze</button>
       </div>
 
-      {error && <p className="error">{error}</p>}
 
       <div className="results">
         <h2>Results</h2>
+        {loading ? (
+        <p>Loading...</p> // You can replace this with a spinner
+      ) : error ? (
+        <p className="error">{error}</p>
+      ) : (
         <ul>
           {results.map((result, index) => (
             <li key={index}>
+              ✅{" "}
               <button
                 className="link-style"
                 onClick={() => handleResultClick(videoUrl, result.start)}
@@ -109,6 +138,8 @@ function App() {
             </li>
           ))}
         </ul>
+
+        )}
       </div>
     </div>
   );

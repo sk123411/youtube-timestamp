@@ -31,14 +31,17 @@ body {
   }
   
   button {
-    background-color: #007bff;
+    /* background-color: #007bff; */
+    background-color: #fe0000;
     color: white;
     border: none;
     cursor: pointer;
   }
   
   button:hover {
-    background-color: #0056b3;
+    /* background-color: #0056b3; */
+    background-color: #e00303;
+
   }
   
   .error {
@@ -69,6 +72,7 @@ body {
   .results a {
     color: #007bff;
     text-decoration: none;
+    text-align: left;
   }
   
   .results a:hover {

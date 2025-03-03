@@ -28,6 +28,8 @@ def analyze():
                     'start': entry['start'],
                     'duration': entry['duration']
                 })
+        if not matches:  # Check if matches is empty
+            return jsonify({'error': 'No matches found'}), 404        
         
         return jsonify(matches)
     
