@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Analyzer",
+  "name": "YouTube Timestamp",
   "version": "1.0",
   "description": "Analyze YouTube videos and extract relevant sections based on a query.",
   "action": {

@@ -1,13 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './styles.css';
 
 function App() {
   const [videoUrl, setVideoUrl] = useState('');
   const [query, setQuery] = useState('');
-  const [language, setLanguage] = useState('en'); // Default to English
+  const [language, setLanguage] = useState('en');
   const [results, setResults] = useState([]);
   const [error, setError] = useState('');
+
+  // Check if the chrome object is available
+  const isChromeExtension = typeof chrome !== 'undefined' && chrome.storage;
+
+  // Load saved state when the component mounts
+  useEffect(() => {
+    if (isChromeExtension) {
+      chrome.storage.sync.get(['videoUrl', 'query', 'language', 'results'], (data) => {
+        if (data.videoUrl) setVideoUrl(data.videoUrl);
+        if (data.query) setQuery(data.query);
+        if (data.language) setLanguage(data.language);
+        if (data.results) setResults(data.results);
+      });
+    }
+  }, [isChromeExtension]);
+
+  // Save state whenever it changes
+  useEffect(() => {
+    if (isChromeExtension) {
+      chrome.storage.sync.set({ videoUrl, query, language, results });
+    }
+  }, [videoUrl, query, language, results, isChromeExtension]);
 
   const handleAnalyze = async () => {
     if (!videoUrl || !query) {
@@ -19,13 +41,21 @@ function App() {
       const response = await axios.post('http://127.0.0.1:5000/analyze', {
         video_url: videoUrl,
         query: query,
-        language: language || 'en', // Use English if no language is selected
+        language: language || 'en',
       });
       setResults(response.data);
       setError('');
     } catch (err) {
       setError('Error analyzing the video. Please check the URL and try again.');
       setResults([]);
+    }
+  };
+
+  const handleResultClick = (videoUrl, start) => {
+    if (isChromeExtension) {
+      chrome.tabs.update({ url: `${videoUrl}&t=${Math.floor(start)}s` });
+    } else {
+      window.location.href = `${videoUrl}&t=${Math.floor(start)}s`;
     }
   };
 
@@ -51,7 +81,6 @@ function App() {
         >
           <option value="en">English</option>
           <option value="zh">Mandarin Chinese</option>
-
           <option value="hi">Hindi</option>
           <option value="es">Spanish</option>
           <option value="fr">French</option>
@@ -60,7 +89,6 @@ function App() {
           <option value="pr">Portuguese</option>
           <option value="ru">Russian</option>
           <option value="ur">Urdu</option>
-
         </select>
         <button onClick={handleAnalyze}>Analyze</button>
       </div>
@@ -85,16 +113,5 @@ function App() {
     </div>
   );
 }
-
-const handleResultClick = (videoUrl, start) => {
-  if (typeof chrome !== 'undefined' && chrome.tabs) {
-    // Open the link in the same tab using the chrome.tabs API
-    chrome.tabs.update({ url: `${videoUrl}&t=${Math.floor(start)}s` });
-  } else {
-    // Fallback for non-Chrome environments (e.g., development)
-    window.location.href = `${videoUrl}&t=${Math.floor(start)}s`;
-  }
-};
-
 
 export default App;
