@@ -50,7 +50,17 @@ function App() {
           onChange={(e) => setLanguage(e.target.value)}
         >
           <option value="en">English</option>
+          <option value="zh">Mandarin Chinese</option>
+
           <option value="hi">Hindi</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="ar">Arabic</option>
+          <option value="bn">Bengali</option>
+          <option value="pr">Portuguese</option>
+          <option value="ru">Russian</option>
+          <option value="ur">Urdu</option>
+
         </select>
         <button onClick={handleAnalyze}>Analyze</button>
       </div>
