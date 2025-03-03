@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Analyzer",
+  "version": "1.0",
+  "description": "Analyze YouTube videos and extract relevant sections based on a query.",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "permissions": ["activeTab", "storage","tabs"],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

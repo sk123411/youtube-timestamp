@@ -1,0 +1,16 @@
+{
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "globals": {
+      "chrome": "readonly"  // Define 'chrome' as a global variable
+    },
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      // Add any custom rules here
+    }
+  }
