@@ -10,6 +10,19 @@ function App() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Mapping of languages to their "hello" translations
+  const helloTranslations = {
+    en: 'Hello',
+    zh: '你好',
+    hi: 'नमस्ते',
+    es: 'Hola',
+    fr: 'Bonjour',
+    ar: 'مرحبا',
+    bn: 'হ্যালো',
+    pr: 'Olá',
+    ru: 'Привет',
+    ur: 'ہیلو',
+  };
 
   // Check if the chrome object is available
   const isChromeExtension = typeof chrome !== 'undefined' && chrome.storage;
@@ -70,7 +83,7 @@ function App() {
         setError('Something went wrong. Please try again.');
       }
       setResults([]);
-    }finally {
+    } finally {
       setLoading(false); // Stop loading
     }
   };
@@ -81,6 +94,14 @@ function App() {
     } else {
       window.location.href = `${videoUrl}&t=${Math.floor(start)}s`;
     }
+  };
+
+  const handleLanguageChange = (e) => {
+    const selectedLanguage = e.target.value;
+    setLanguage(selectedLanguage);
+    setQuery(''); // Clear the query text
+    // Set the placeholder hint based on the selected language
+    document.getElementById('query-input').placeholder = `e.g., ${helloTranslations[selectedLanguage]}`;
   };
 
   return (
@@ -94,14 +115,15 @@ function App() {
           onChange={(e) => setVideoUrl(e.target.value)}
         />
         <input
+          id="query-input"
           type="text"
-          placeholder="Enter search query"
+          placeholder={`e.g., ${helloTranslations[language]}`}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
         <select
           value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          onChange={handleLanguageChange}
         >
           <option value="en">English</option>
           <option value="zh">Mandarin Chinese</option>
@@ -117,28 +139,26 @@ function App() {
         <button onClick={handleAnalyze}>Analyze</button>
       </div>
 
-
       <div className="results">
         <h2>Results</h2>
         {loading ? (
-        <p>Loading...</p> // You can replace this with a spinner
-      ) : error ? (
-        <p className="error">{error}</p>
-      ) : (
-        <ul>
-          {results.map((result, index) => (
-            <li key={index}>
-              ✅{" "}
-              <button
-                className="link-style"
-                onClick={() => handleResultClick(videoUrl, result.start)}
-              >
-                {result.text} (at {Math.floor(result.start)}s)
-              </button>
-            </li>
-          ))}
-        </ul>
-
+          <p>Loading...</p> // You can replace this with a spinner
+        ) : error ? (
+          <p className="error">{error}</p>
+        ) : (
+          <ul>
+            {results.map((result, index) => (
+              <li key={index}>
+                ✅{" "}
+                <button
+                  className="link-style"
+                  onClick={() => handleResultClick(videoUrl, result.start)}
+                >
+                  {result.text} (at {Math.floor(result.start)}s)
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>
