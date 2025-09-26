@@ -16,18 +16,20 @@ def analyze():
     video_id = video_url.split('v=')[1].split('&')[0]
 
     try:
-        # Fetch transcript in the specified language
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=[language])
+        # Create API instance and fetch transcript using the new syntax
+        ytt_api = YouTubeTranscriptApi()
+        fetched_transcript = ytt_api.fetch(video_id, languages=[language])
         
-        # Find matches
+        # Extract snippets from the FetchedTranscript object
         matches = []
-        for entry in transcript:
-            if query.lower() in entry['text'].lower():
+        for snippet in fetched_transcript.snippets:
+            if query.lower() in snippet.text.lower():
                 matches.append({
-                    'text': entry['text'],
-                    'start': entry['start'],
-                    'duration': entry['duration']
+                    'text': snippet.text,
+                    'start': snippet.start,
+                    'duration': snippet.duration
                 })
+        
         if not matches:  # Check if matches is empty
             return jsonify({'error': 'No matches found'}), 404        
         
